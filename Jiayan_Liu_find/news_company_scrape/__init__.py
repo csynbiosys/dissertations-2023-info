@@ -1,6 +1,0 @@
-from news_company_scrape import scraper_newsCrunchbase
-from news_company_scrape import scraper_Techcrunch
-from news_company_scrape import scraper_Thenextweb
-from news_company_scrape import scraper_Venturebeat
-from news_company_scrape import extract_article_content
-from news_company_scrape import news_ner_spacy
