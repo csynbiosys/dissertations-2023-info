@@ -1,5 +1,0 @@
-requests
-beautifulsoup4import csv
-numpy
-pandas
-matplotlib

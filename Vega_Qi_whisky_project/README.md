@@ -1,43 +1,23 @@
-# Auction Price Prediction
+# Whisky Price Prediction
 
 ## Data Collection
-### Environment 
-```bash pip3 install -r requirements.txt ```
-### Crawl Data from Different Websites 
-1. ***scotchwhiskyauctions.com***
-- run codes
-	- run `mkdir data; mkdir data_csv` in command line
-	- get distillery names `dist_names.json` from `https://whiskymate.net/the-distillery-list/`: `python3 crawl_auction.py --run ex-name`
-	- multi-thread crawl auction records from {st=0} and {ed=100} and get json file: `python3 crawl_auction.py --run crawl --st 0 --ed 100`
-		- st or ed stand for one auction (totally 147 auctions and **60w+** object records)
-		- one dir includes multiple object json files(20 object per page(file))
-	- multi-process&thread crawl(run multiple crawl programs separately simultaneously): `bash crawl.sh`
-	- convert single json file to csv: `python3 crawl_auction.py --run parse --st 0 --ed 100`
-	- merge all csv files and post data processing using regex, statistics: `run parse_data.ipynb and post_process_1.ipynb in order` and we get total processed file `data_all_v2.csv`
-		- remove non-meaningful columns
-		- extract value from original text
-		- remove rows with multiple nan value
-		- fill values using other columns e.g. `age = bottled - distilled`
-		- remove and clip extreme values
-- crawled data demo
 
-> other statistics and visualization for dataset in output of above Jupyter notebook.
+Data scraping, post-processing and visualization codes and Intermediate run results are demonstrated in `data_scraping.ipynb` file. In jupyter notebook file, codes are splited in below parts including `1. Data Scraping`, `2. Post Process`and `3. Visualization`.
 
-<img src="/Users/gmm/Library/Application Support/typora-user-images/image-20230720192053804.png" alt="image-20230720192053804" style="zoom:50%;" />
+### 1 Data Scraping
+
+Because of large scale data need to be scrapped from different subpages in one websites, we run python code with multi-processing and multi-threading speeding skills. In notebook file, running codes in command are shown, such as `python3 crawl_auction.py --run crawl --st 0 --ed 10 &`. Data are scrapped from Two websites(https://whiskyauction.com/,https://www.scotchwhiskyauctions.com/), with `--run` indicating running mode, `--st, --ed` standing for starting and ending indexes for multi-processing running. For crawling all current data, `--ed 150` and `--ed 490000` are enough for two source website, respectively.
+
+## 2. Post Processing
+
+These codes are used for processing data to clean version for model training, prediction and evaluation. Cells in the part 2.1 and 2.2 process data from [website1](https://www.scotchwhiskyauctions.com/) and cells in the part 2.3 for [website2](https://whiskyauction.com/). The part 2.4 further remove useless columns and change feature type to convert processed csv data into model-friendly format. In order to reproduce outputs and generate dataset for model training, running notebook cells step by step is sufficient.
+
+## 3. Visualization
+
+In this part, we remove nan values and only keep 5%~95% percentile datas for different feature based on dataframe before post process stage2.4. Hist plot and density plot are utilized for observing data distribution for continuous numerical features, discrete category features and regression prediction  target `Winning bid`. Furthermore, the history timing information `his_bid_times` and `his_bid_prices` are auction years(2010-2023) and history auction prices(with simiar range to `Winning bid`).
 
 
 
-2. ***whiskyauction.com***
+# Modelling
 
-- run codes
-	- run `cd other_websites; mkdir data` in command line
-	- using `dist_names.json` from above process
-	- multi-thread crawl auction records from {st=0} and {ed=10000} and get json file: `python3 crawl_auction.py --st 0 --ed 10000`
-		- st or ed constraint the range of object records (totally **49w+** object records)
-		- maybe reset connection by peer (ban IP or other anti-crawl in target website)
-	- multi-process&thread crawl(run multiple crawl programs separately simultaneously): `bash crawl.sh`
-	- convert single json file to csv: `python3 crawl_auction.py --run parse --st 0 --ed 10000`
-	- TODO: post process for csv files similar to crawling process of above website.
-
-- crawled data demo 
-
+Price prediction regression modelling codes are show in `model.ipynb`. The part1 `1. ML Models` and part2 `DNN Models` are separately used for traditional machine learning models(such as LR, Lasso, SVM, Decision Tree, Random Forest and GBDT) and deep learning models(such as LSTM&DNN, CNN&DNN and pure DNN) with timing information extraction. For each part, data load and scale(standard scale, minmax scale or orginal format) are utilized in preprocessing the part1.1 and 2.1. The prefix 'LSTM&' and 'CNN&' stand for model types chosen for modelling historical auction time prices for time series information and the suffix 'DNN' indicates the MLP network for normal numerical features. Model training, prediction and evaluation are shown in the part1.2 and 2.2. Furthermore, the comparison experiments can be reproduce using cell codes in the parts1.2 and 2.2 for different scale methods, datasets with distribution gap and  variant models both suitable for regression task. The deep learning model structures and parameters scale can be found in the part2.3.
