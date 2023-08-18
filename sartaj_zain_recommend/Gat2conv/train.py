@@ -347,10 +347,10 @@ def main():
 
  
 
-    # Create a figure for the plots
+    
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 12))
 
-    # Plot training and validation loss per epoch
+    
     ax1.plot(trainplotloss, label='Training Loss')
     ax1.plot(valplotloss, label='Validation Loss')
     ax1.set_title('Training & Validation Loss per Epoch')
@@ -358,7 +358,7 @@ def main():
     ax1.set_ylabel('Loss')
     ax1.legend()
 
-    # Plot training and validation accuracy per epoch
+    
     ax2.plot(trainplotf1, label='Training F1')
     ax2.plot(valplotf1, label='Validation F1')
     ax2.set_title('Training & Validation F1 per Epoch')
@@ -368,7 +368,7 @@ def main():
 
 
 
-    # Show the plots
+   
     plt.tight_layout()
     plt.savefig("plot_rgat_500e,1e-3lrl2,256,128b.png")
     plt.show()

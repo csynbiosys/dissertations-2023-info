@@ -47,55 +47,34 @@ def parse_args():
     return args
 def main():
     args = parse_args()
-    # Read your csv files
+    
     df = pd.read_csv('investor_startup_rel_freq.csv')
     df_investor = pd.read_csv('investor_features_n_embedding.csv')
     df_startup = pd.read_csv('startup_features_n_text_embedding.csv')
     
-    # Initialize GroupShuffleSplit
+    
     gss = GroupShuffleSplit(n_splits=1, test_size=0.10, random_state=42)
     
-    # Split data based on the org_uuid group
+   
     train_idx, test_idx = next(gss.split(df, groups=df['org_uuid']))
     
     df_train = df.iloc[train_idx]
     df_test_startups = df.iloc[test_idx]
     
-    # Get unique investor_uuids in each set
+    
     investor_train = set(df_train['investor_uuid'])
     investor_test = set(df_test_startups['investor_uuid'])
     
-    # Find exclusive investors in df_test_startups
+    
     exclusive_investors_test = investor_test - investor_train
     
-    # Move the exclusive investors from df_test_startups to df_train
+    
     for investor in exclusive_investors_test:
         move_rows = df_test_startups[df_test_startups['investor_uuid'] == investor]
         df_train = pd.concat([df_train, move_rows])
         df_test_startups = df_test_startups.drop(move_rows.index)
     
-    # Verify that the org_uuids don't overlap between the datasets
-    # assert set(df_test_startups['org_uuid']).isdisjoint(set(df_train['org_uuid']))
-    # df = pd.read_csv('df_present_new_freq.csv')
-    # df_investor = pd.read_csv('investor_features_n_embedding.csv')
-    # df_startup = pd.read_csv('startup_features_n_text_embedding.csv')
     
-    # # df_test_startups = df.tail(100)
-    # # df = df.iloc[:-100]
-    
-    # # df, df_test_startups = train_test_split(df, test_size=0.10, random_state=42)
-    # gss = GroupShuffleSplit(n_splits=1, test_size=0.10, random_state=42)
-
-    
-    # train_idx, test_idx = next(gss.split(df, groups=df['org_uuid']))
-    
-    # df_test_startups = df.iloc[test_idx]
-    # df = df.iloc[train_idx]
-    
-    
-    
-    # assert set(df_test_startups['org_uuid']).isdisjoint(set(df['org_uuid']))
-
     
     df_test_startups = pd.merge(df_test_startups[['org_uuid','org_name','investor_uuid','investor_name']],df_startup,how='left', left_on='org_uuid',right_on='org_uuid')
     df_test_startups.to_csv(args.ofile_df)
@@ -124,9 +103,7 @@ def main():
     print(org_features.size())
     assert investor_features.size() == (66878, 4517)
     assert org_features.size() == (112794, 2613)
-    #knn
     
-    # Check if CUDA is available
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
     # if device == "cuda":

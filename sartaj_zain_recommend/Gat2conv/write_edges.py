@@ -50,20 +50,20 @@ def main():
 
     gss = GroupShuffleSplit(n_splits=1, test_size=0.10, random_state=42)
     
-    # Split data based on the org_uuid group
+    
     train_idx, test_idx = next(gss.split(df, groups=df['org_uuid']))
     
     df_train = df.iloc[train_idx]
     df_test_startups = df.iloc[test_idx]
     
-    # Get unique investor_uuids in each set
+    
     investor_train = set(df_train['investor_uuid'])
     investor_test = set(df_test_startups['investor_uuid'])
     
-    # Find exclusive investors in df_test_startups
+    
     exclusive_investors_test = investor_test - investor_train
     
-    # Move the exclusive investors from df_test_startups to df_train
+    
     for investor in exclusive_investors_test:
         move_rows = df_test_startups[df_test_startups['investor_uuid'] == investor]
         df_train = pd.concat([df_train, move_rows])
@@ -114,7 +114,7 @@ def main():
     investment_vc_id = torch.from_numpy(investment_vc_id['mappedID'].values)
     edge_index_investor_to_startup = torch.stack([investment_startup_id,investment_vc_id], dim=0)
 
-    #assert edge_index_investor_to_startup.size() == (2, 354648)
+    
     print()
     print("Final edge indices pointing from investors to startups:")
     print("=================================================")

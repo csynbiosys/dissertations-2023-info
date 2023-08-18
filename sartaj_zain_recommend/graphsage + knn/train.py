@@ -194,7 +194,7 @@ def main():
             
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 12))
 
-    # Plot training and validation loss per epoch
+    
     ax1.plot(train_losses, label='Training Loss')
     ax1.plot(val_losses, label='Validation Loss')
     ax1.set_title(f'Training & Validation Loss per Epoch\nLR: {args.lr}, Weight Decay: {args.weight_decay}, Batch Size: {args.batch_size}')
@@ -202,7 +202,7 @@ def main():
     ax1.set_ylabel('Loss')
     ax1.legend()
 
-    # Plot training and validation accuracy per epoch
+    
     ax2.plot(train_f1_scores, label='Training F1')
     ax2.plot(val_f1_scores, label='Validation F1')
     ax2.set_title(f'Training & Validation F1 per Epoch\nLR: {args.lr}, Weight Decay: {args.weight_decay}, Batch Size: {args.batch_size}')
@@ -210,7 +210,7 @@ def main():
     ax2.set_ylabel('Accuracy')
     ax2.legend()
 
-    # Show the plots
+    
     plt.tight_layout()
   
     plt.savefig(f"plot_gsageemb_and_fea_{args.lr}_{args.weight_decay}_{args.batch_size}.png")
@@ -270,30 +270,7 @@ def main():
         
     return np.mean(val_losses)
             
-# def objective(trial):
-#     # Suggest values for the hyperparameters
-#     lr = trial.suggest_loguniform('lr', 1e-5, 1e-2)
-#     weight_decay = trial.suggest_loguniform('weight_decay', 1e-5, 1e-1)
-    
-#     batch_size = trial.suggest_int('batch_size', 32, 256)
 
-
-
-#     args = argparse.Namespace(lr=lr, weight_decay=weight_decay,  batch_size=batch_size, ifile="data.pt")
-#     #args = argparse.Namespace(lr=lr, k=k, batch_size=batch_size, ifile="None.npz")
-
-
-
-#     return run(args)
-
-
-# def main():
-#     # Set up the logger
-#     logging.basicConfig(level=logging.INFO)
-#     # Create a new study or load an existing study
-#     study = optuna.create_study(direction="minimize")
-#     # Optimize the study
-#     study.optimize(objective, n_trials=15) 
         
 if __name__ == '__main__':
     main()     

@@ -71,31 +71,31 @@ def parse_args():
 
     return args
 def precision_at_k(y_true, y_pred, b):
-    # Get top-k predicted scores
+    
     top_k_indices = np.argsort(y_pred)[-b:]
     
-    # Count the actual positive samples in the top-k predictions
+    
     relevant_items = sum(y_true[top_k_indices])
     
     return relevant_items / b
 
 def recall_at_k(y_true, y_pred, b):
-    # Get top-k predicted scores
+    
     top_k_indices = np.argsort(y_pred)[-b:]
     
-    # Count the actual positive samples in the top-k predictions
+    
     relevant_items = sum(y_true[top_k_indices])
     
-    # Total number of actual positive samples
+    
     total_positive = sum(y_true)
     
     return relevant_items / total_positive
 
 def hit_rate(y_true, y_pred, b):
-    # Get top-k predicted scores
+    
     top_k_indices = np.argsort(y_pred)[-b:]
     
-    # Check if any of the top-k predictions are actual positive samples
+    
     hit = int(any(y_true[top_k_indices]))
     
     return hit
@@ -215,8 +215,8 @@ def main():
     
     f = f1_score(y.flatten(), np.round(expit(Y_pred).flatten()))
     logging.info('got eval f1 of {}...'.format(f))
-    # Evaluate hit rate, precision at k, and recall at k
-    b = 10  # or any other value you want to set for 'k'
+    
+    b = 10  
     hit_rates = []
     precisions = []
     recalls = []
@@ -243,7 +243,7 @@ def main():
     loss = criterion(Y_pred, y).item()
     logging.info('got eval loss of {}...'.format(loss))
     
-    # Load the data from the .npz file
+    
     data_pred = np.load('test_preds.npz')
     y_pred = data_pred['y_pred']
     print(y_pred.shape)
@@ -253,43 +253,41 @@ def main():
     print(original_indices)
     
     
-    # Load the mapping of indices to investor names from the JSON file
+    
     with open("investor_name_dict.json", "r") as file:
         investor_name_dict = json.load(file)
         
     with open("startup_name_dict.json", "r") as file:
         startup_name_dict = json.load(file)
     
-    # Implementing the logic to identify the top 10 investors for each startup based on predictions
     top_investors_for_startups = {}
     
-    for startup_index in range(y_pred.shape[0]):  # Loop through each startup
-        # Get predictions for the startup and filter out investors with predictions less than 0.7
+    for startup_index in range(y_pred.shape[0]):
         investor_indices_with_high_predictions = np.where(expit(y_pred[startup_index]) > 0.5)[0]
     
-        # Sort these investors based on the prediction values in descending order
+        
         sorted_investor_indices = investor_indices_with_high_predictions[np.argsort(-y_pred[startup_index][investor_indices_with_high_predictions])]
     
-        # Take the top 10 investors
+        
         top_10_investors = sorted_investor_indices[:10]
     
-        # Map indices to investor names and store in the dictionary
+        
         original_startup_index = original_indices[startup_index]
         top_investors_for_startups[original_startup_index] = [investor_name_dict[str(index)] for index in top_10_investors]
     
-    # Check if the actual investor is present in the recommended investors for each startup
+    
     for startup_index in range(y.shape[0]):
-        # Get actual investors for the startup from the y matrix
+        
         actual_investor_indices = np.where(y[startup_index] == 1)[0]
         actual_investor_names = [investor_name_dict[str(index)] for index in actual_investor_indices]
     
-        # Get the recommended investors for the startup
+        
         recommended_investor_names = top_investors_for_startups[original_indices[startup_index]]
     
-        # Check if any actual investor is present in the list of recommended investors
+        
         common_investors = set(actual_investor_names).intersection(recommended_investor_names)
     
-        # Print the result
+        
         startup_name = startup_name_dict[str(original_indices[startup_index])]
         print(f"Startup: {startup_name}")
         print(f"Actual Investors: {actual_investor_names}")

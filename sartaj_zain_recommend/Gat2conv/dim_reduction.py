@@ -104,7 +104,7 @@ def main():
     filename = 'pca_model.pkl'
     pickle.dump(pca, open(filename, 'wb'))
     
-    # ${code_blocks}
+    
 
 if __name__ == '__main__':
     main()

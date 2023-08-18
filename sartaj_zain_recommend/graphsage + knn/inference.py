@@ -273,10 +273,10 @@ def main():
         current_recommendations = set(recs)
         current_actuals = set(df_check[df_check['org_name']==st]['investor_name'].values)
         
-        # Find common investors
+        
         common_investors = current_recommendations.intersection(current_actuals)
         
-        # Check if there are actual investors before displaying recommendations
+        
         if len(common_investors) > 0:
             print("Startup: ", st)
             print(" Recommendations: ", recs)
@@ -301,7 +301,7 @@ def main():
         hit_rate_values.append(hit_rate(recommended, actual))
         map_values.append(mean_average_precision(recommended, actual))
     
-    # Average the metric values
+    
     avg_precision_at_k = np.mean(precision_at_k_values)
     avg_recall_at_k = np.mean(recall_at_k_values)
     avg_hit_rate = np.mean(hit_rate_values)

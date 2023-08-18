@@ -97,9 +97,9 @@ def run(args):
     
     loader = NeighborLoader(
         data,
-        # Sample 30 neighbors for each node for 2 iterations
+        
         num_neighbors = [-1, 0],
-        # Use a batch size of 128 for sampling training nodes
+        
         batch_size = batch_size      ,#6
         input_nodes = ('inv', torch.LongTensor(np.array(range(x0.shape[0])))),
         shuffle = True
@@ -154,11 +154,7 @@ def run(args):
     
     logging.info('have {} test orgs...'.format(len(test_orgs)))
     
-    # with open("test_orgs.json", "w") as f:
-    #     json.dump(list(test_orgs), f)
-        
-    # with open("neg_pos.json", "w") as f:
-    #     json.dump(neg_pos, f)
+    
         
     np.savez('ts_np.npz', test_orgs=test_orgs, neg_pos=neg_pos)
 
@@ -482,12 +478,12 @@ def objective(trial):
 
 
 def main():
-    # Set up the logger
+    
     logging.basicConfig(level=logging.INFO)
 
-    # Create a new study or load an existing study
+    # Create a new study 
     study = optuna.create_study(direction="minimize")
-    # Optimize the study
+    
     study.optimize(objective, n_trials=30)
 
 
