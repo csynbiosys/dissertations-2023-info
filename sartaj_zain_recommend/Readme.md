@@ -1,3 +1,5 @@
+Link to the whole project: https://uoe-my.sharepoint.com/:f:/g/personal/s2340198_ed_ac_uk/EnTRwKm_d9JGiSum8Uf2aDwBZLm3z3W7ofbGxJmdR56IYA?e=YZjJdI
+
 # Data Preprocessing and EDA
 
 ## Sartaj's Notebooks
