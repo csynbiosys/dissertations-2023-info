@@ -94,18 +94,13 @@ def main():
         'startupId': unique_startup_id,
         'mappedID': pd.RangeIndex(len(unique_startup_id)),
     })
-    print("Mapping of startups to consecutive values:")
-    print("==========================================")
-    print(unique_startup_id.head())
-    print()
+
     unique_investor_id = df['investor_uuid'].unique()
     unique_investor_id = pd.DataFrame(data={
         'investorId': unique_investor_id,
         'mappedID': pd.RangeIndex(len(unique_investor_id)),
     })
-    print("Mapping of investors to consecutive values:")
-    print("===========================================")
-    print(unique_investor_id.head())
+
     investment_startup_id = pd.merge(df['org_uuid'], unique_startup_id,
                                 left_on='org_uuid', right_on='startupId', how='left')
     investment_startup_id = torch.from_numpy(investment_startup_id['mappedID'].values)
@@ -115,10 +110,8 @@ def main():
     edge_index_investor_to_startup = torch.stack([investment_startup_id,investment_vc_id], dim=0)
 
     
-    print()
-    print("Final edge indices pointing from investors to startups:")
-    print("=================================================")
-    print(edge_index_investor_to_startup)
+
+
 
     startup_map = unique_startup_id.set_index('startupId')['mappedID'].to_dict()
     investor_map = unique_investor_id.set_index('investorId')['mappedID'].to_dict()

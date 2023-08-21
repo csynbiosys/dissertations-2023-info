@@ -91,7 +91,7 @@ def main():
     investor_features_df = df_investor.loc[df_investor['investor_uuid'].drop_duplicates().index].drop(columns=['investor_uuid','uuid'])
     org_features_df = df_startup.loc[df_startup['org_uuid'].drop_duplicates().index].drop(columns=['org_uuid','embeddings','description'])
     
-    print(org_features_df.columns)
+
     
     investor_features_df.fillna(0,inplace=True)
     org_features_df.fillna(0,inplace=True)
@@ -138,18 +138,13 @@ def main():
         'startupId': unique_startup_id,
         'mappedID': pd.RangeIndex(len(unique_startup_id)),
     })
-    print("Mapping of startups to consecutive values:")
-    print("==========================================")
-    print(unique_startup_id.head())
-    print()
+
     unique_investor_id = df_train['investor_uuid'].unique()
     unique_investor_id = pd.DataFrame(data={
         'investorId': unique_investor_id,
         'mappedID': pd.RangeIndex(len(unique_investor_id)),
     })
-    print("Mapping of investors to consecutive values:")
-    print("===========================================")
-    print(unique_investor_id.head())
+
     investment_startup_id = pd.merge(df_train['org_uuid'], unique_startup_id,
                                 left_on='org_uuid', right_on='startupId', how='left')
     investment_startup_id = torch.from_numpy(investment_startup_id['mappedID'].values)
@@ -158,10 +153,7 @@ def main():
     investment_vc_id = torch.from_numpy(investment_vc_id['mappedID'].values)
     edge_index_investor_to_startup = torch.stack([investment_startup_id,investment_vc_id], dim=0)
     # assert edge_index_investor_to_startup.size() == (2, 354548)
-    print()
-    print("Final edge indices pointing from investors to startups:")
-    print("=================================================")
-    print(edge_index_investor_to_startup)
+
     
     startup_map = unique_startup_id.set_index('startupId')['mappedID'].to_dict()
     investor_map = unique_investor_id.set_index('investorId')['mappedID'].to_dict()
