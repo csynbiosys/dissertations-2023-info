@@ -80,25 +80,20 @@ def parse_args():
 
 
 def process_startup_features(provided_startup_features, args):
-    # Assuming the provided_startup_features is already a numpy array
-    # 1. PCA transformation
+
     pca = pickle.load(open(args.pca, 'rb'))
-    # X_transformed = pca.transform(provided_startup_features.reshape(1, -1))
     
     
     
-    # # 2. Normalization
-    # mean_pca = np.load('mean_pca_x1.npy')
-    # std_pca = np.load('std_pca_x1.npy')
-    # X_normalized = (X_transformed - mean_pca) / std_pca
+
     X = provided_startup_features
     
-    variance_mask = np.load('variance_mask_x1.npy')  # Load the actual variance mask (ii) here
-    Xm = np.load('Xm_x1.npy')  # Load the actual mean (Xm) here
+    variance_mask = np.load('variance_mask_x1.npy')  
+    Xm = np.load('Xm_x1.npy')  
     
     X = X[:, variance_mask]
     
-    # 4. Zero-Centering (Mean Subtraction)
+
     X = X - Xm
     
     x0 = np.load(args.ifile)['x0']
@@ -107,11 +102,8 @@ def process_startup_features(provided_startup_features, args):
     
     X_transformed = pca.transform(X)
     
-    # 6. Normalization
-    # Assuming you have saved and loaded mean_pca and std_pca from the training script
-    # For now, let's create dummy variables for these; replace these with the actual loaded values
-    mean_pca = np.load('mean_pca_x1.npy')  # Load the actual mean of PCA-transformed training data here
-    std_pca = np.load('std_pca_x1.npy')  # Load the actual std of PCA-transformed training data here
+    mean_pca = np.load('mean_pca_x1.npy') 
+    std_pca = np.load('std_pca_x1.npy')  
     
     X_normalized = (X_transformed - mean_pca) / std_pca
     
@@ -124,12 +116,12 @@ def recommend(provided_startup_features):
     PATH = args.model_path
     batch_size = 16
 
-    # Load model
+
     model = Model().to(device)
     model.load_state_dict(torch.load(PATH))
     model.eval()
 
-    # Load data
+
     x0 = np.load(args.ifile)['x0']
     x1 = np.load(args.ifile)['x1']
     edge_index = np.load('data.npz')['edge_index'][::-1, :].copy()
@@ -139,7 +131,7 @@ def recommend(provided_startup_features):
     edge_index = data['inv', 'ii', 'org'].edge_index
     x_new = process_startup_features(provided_startup_features, args)
 
-    # Prediction setup
+
     ii = list(range(x0.shape[0]))
     #random.shuffle(ii)
     inv_ii = chunks(list(ii), batch_size)
@@ -147,8 +139,7 @@ def recommend(provided_startup_features):
     for ix, ii in enumerate(inv_ii):
         if ix % 200 == 0:
             logging.info('on batch {}...'.format(ix))
-        
-        # get the graph to test against
+
         x_inv = x0[ii]
     
     
@@ -183,23 +174,17 @@ def recommend(provided_startup_features):
     
         with torch.no_grad():
             y_pred = model(x, e, edge_attr, batch['inv'].x.shape[0], x_new.shape[0])
-            # print(y_pred)
-            # _.extend()
+
             
         Y_pred.append(y_pred.detach().cpu().numpy().T)
         
     
     
-    # print(Y_pred)
 
-    # Extracting the investor recommendations
     with open("investor_name_dict.json", "r") as file:
         investor_name_dict = json.load(file)
 
-    # Get predictions for the startup and filter out investors with predictions greater than 0.5
-    # for y in Y_pred:
-    #     print(y.shape)
-    # Before concatenating, remove the last array
+
     Y_pred = Y_pred[:-1]
 
 
@@ -214,41 +199,38 @@ def recommend(provided_startup_features):
     
     print(investor_indices_with_high_predictions)
     
-    # Sort these investors based on the prediction values in descending order
+
     sorted_investor_indices = investor_indices_with_high_predictions[np.argsort(-Y_pred_array.flatten()[investor_indices_with_high_predictions])]
 
-    #sorted_investor_indices = investor_indices_with_high_predictions[np.argsort(-Y_pred_array[investor_indices_with_high_predictions])]
 
-    # Take the top 10 investors
     top_10_investors = sorted_investor_indices[:10]
     
     print(top_10_investors)
     
-    # Map indices to investor names and print
+    
     recommended_investors = [investor_name_dict[str(index)] for index in top_10_investors]
     print(recommended_investors)
 
 
-# Example usage:
-# Replace with your actual startup features
+
 df_new_startups = pd.read_csv('test_startups_r.csv')
  
-# 2. Clean the Data
+
 df_new_startups.drop('Unnamed: 0', inplace=True, axis=1)
 df_new_startups.drop('Unnamed: 0.1', inplace=True, axis=1)
 df_new_startups.fillna(0, inplace=True)
  
 num_columns = len(df_new_startups.columns)
-# print("Number of columns:", num_columns)
+
  
  
  
  
 print(df_new_startups[8:9]['org_uuid'])
-# X = df_new_startups.loc[df_new_startups['org_uuid'].drop_duplicates().index].drop(columns=['org_uuid','description', 'embeddings'])
+
 X = df_new_startups.loc[df_new_startups['org_uuid'].drop_duplicates().index].drop(columns=['org_uuid','description', 'embeddings'])
 X = X[8:9].values
-provided_startup_features = np.array(X)  # Replace with your actual features
+provided_startup_features = np.array(X)  
 recommend(provided_startup_features)
 
   
